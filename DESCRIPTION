@@ -1,0 +1,23 @@
+Package: phsuR
+Type: Package
+Title: Data Tools for Population Health and Regional Analysis
+Version: 0.1.0
+Author: Brendan Bakos
+Maintainer: Brendan Bakos <brendan.bakos@vch.ca>
+Description: Provides tools for geocoding and spatial analysis with a focus on
+  attaching regional boundary information to datasets. Initially developed for
+  the Population Health Surveillance Unit (PHSU), the package is designed to
+  support broader applications in spatial data processing and analysis.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Imports:
+  sf,
+  purrr,
+  dplyr,
+  httr2,
+  snakecase
+Depends: 
+  R (>= 4.1.0)
+RoxygenNote: 7.3.2
