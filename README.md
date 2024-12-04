@@ -13,7 +13,7 @@ Install the development version from GitHub:
 
 ```R
 install.packages("remotes")
-remotes::install_github("your-username/phsuR")
+remotes::install_github("brbakos/phsuR")
 ```
 
 # Usage
