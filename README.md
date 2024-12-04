@@ -1,6 +1,6 @@
 # phsuR
 
-phsuR is an R package for geocoding and spatial analysis, designed to support the Population Health Surveillance Unit (PHSU). It simplifies retrieving geographic data, performing spatial joins, and attaching regional boundary information to datasets.
+phsuR is an R package for geocoding and spatial analysis, designed to support the Public Health Surveillance Unit (PHSU). It simplifies retrieving geographic data, performing spatial joins, and attaching regional boundary information to datasets.
 Features
 
 * Geocode addresses using the BC Address Geocoder API.
