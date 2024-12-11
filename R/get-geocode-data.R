@@ -51,18 +51,23 @@ get_geocode_with_region <- function(address,
       rate_limit = rate_limit
     )
 
-  address_data$data <-
-    spatial_join_with_boundaries(
-      address_data$data,
-      coords = coords,
-      crs = crs
-    )
-
   if (faults) {
-    return(address_data)
+    address_data$data <-
+      spatial_join_with_boundaries(
+        address_data$data,
+        coords = coords,
+        crs = crs
+      )
   } else {
-    return(address_data$data)
+    address_data <-
+      spatial_join_with_boundaries(
+        address_data,
+        coords = coords,
+        crs = crs
+      )
   }
+
+  return(address_data)
 
 }
 
@@ -122,6 +127,14 @@ get_geocode_data <- function(address,
                              api_key = NULL,
                              faults = TRUE,
                              rate_limit = 1000) {
+
+  if (!is.logical(faults) || length(faults) != 1) {
+    stop("'faults' must be a single logical value (TRUE or FALSE).")
+  }
+
+  if (!is.null(rate_limit) && (!is.numeric(rate_limit) || rate_limit <= 0 || rate_limit %% 1 != 0)) {
+    stop("'rate_limit' must be a positive integer or NULL.")
+  }
 
   delay_per_request <- if (!is.null(rate_limit)) 60 / rate_limit else 0
 
