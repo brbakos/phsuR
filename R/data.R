@@ -1,6 +1,6 @@
 #' CHSA Boundaries in British Columbia
 #'
-#' A shapefile dataset containing the boundaries of Community Health Service Areas (CHSAs) in British Columbia.
+#' A shapefile dataset containing the boundaries of the 2022 Community Health Service Areas (CHSAs) in British Columbia.
 #'
 #' @format A `sf` object with 231 rows and the following columns:
 #' \describe{
@@ -22,7 +22,7 @@
 #' @details
 #' The CHSA boundaries are defined by the Government of British Columbia. The dataset
 #' is updated every four years following the Census. Users will need to update their package or
-#' data.
+#' data. This data is the 2022 version of the boundaries.
 #'
 #' The dataset includes detailed classification for urban and rural designations,
 #' as well as hierarchical relationships to LHAs, HSDAs, and Health Authorities.
