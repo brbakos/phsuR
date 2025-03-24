@@ -252,6 +252,11 @@ get_geocode_data <- function(address,
 
   geocode_results <- purrr::map_dfr(results, "data")
   geocode_results <- geocode_results |> purrr::set_names(~ snakecase::to_snake_case(.x))
+  geocode_results <-
+    geocode_results |>
+    dplyr::mutate(
+      dplyr::across(c(latitude, longitude), ~ as.numeric(.x))
+    )
   faults_results <- purrr::map_dfr(results, "faults")
 
   if (faults) {
