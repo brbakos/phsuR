@@ -257,6 +257,13 @@ get_geocode_data <- function(address,
     dplyr::mutate(
       dplyr::across(c(latitude, longitude), ~ as.numeric(.x))
     )
+  geocode_results <-
+    geocode_results |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(), ~ dplyr::if_else(.x %in% "", NA, .x)
+      )
+    )
   faults_results <- purrr::map_dfr(results, "faults")
 
   if (faults) {
