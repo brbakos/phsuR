@@ -324,7 +324,7 @@ is_holiday <- function(query_date) {
 #'
 #' @export
 is_observed_holiday <- function(query_date) {
-  holiday_year <- lubriquery_date::year(query_date)
+  holiday_year <- lubridate::year(query_date)
   observed_holidays <- get_observed_holidays(holiday_year)
 
   query_date %in% observed_holidays
