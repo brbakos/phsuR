@@ -81,11 +81,12 @@ compute_victoria_day <- function(calendar_year) {
   may_25 <- as.Date(sprintf("%d-05-25", calendar_year))
   weekday_number <- lubridate::wday(may_25, week_start = 1)
 
-  if (weekday_number == 1) {
-    victoria_day <- may_25 - lubridate::days(7)
-  } else {
-    victoria_day <- may_25 - lubridate::days(weekday_number - 1)
-  }
+  victoria_day   <-
+    dplyr::if_else(
+      weekday_number == 1,
+      may_25 - lubridate::days(7),
+      may_25 - lubridate::days(weekday_number - 1)
+    )
 
   victoria_day
 }
@@ -106,15 +107,13 @@ compute_labour_day <- function(calendar_year) {
   sept_1 <- as.Date(sprintf("%d-09-01", calendar_year))
   weekday_number <- lubridate::wday(sept_1, week_start = 1)
 
-  if (weekday_number == 1) {
-
-    labour_day <- sept_1
-
-  } else {
-
-    labour_day <- sept_1 + lubridate::days(8 - weekday_number)
-
-  }
+  labour_day <-
+    dplyr::if_else(
+      weekday_number == 1,
+      sept_1,
+      sept_1 + lubridate::days(8 - weekday_number)
+    )
+  labour_day
 }
 
 #' Compute Thanksgiving Day
@@ -208,40 +207,27 @@ compute_bc_day <- function(calendar_year) {
 #' @export
 get_holidays <- function(calendar_year) {
 
-  ## fixed date
-  new_years_day            <- as.Date(paste0(calendar_year, "-01-01"))
-  canada_day               <- as.Date(paste0(calendar_year, "-07-01"))
-  remembrance_day          <- as.Date(paste0(calendar_year, "-11-11"))
-  christmas_day            <- as.Date(paste0(calendar_year, "-12-25"))
-  boxing_day               <- as.Date(paste0(calendar_year, "-12-26"))
-  truth_and_reconciliation <- as.Date(paste0(calendar_year, "-09-30"))
+  yrs <- unique(as.integer(calendar_year))
+  hols_per_year <- lapply(yrs, function(y) {
+    c(
+      "New Year's Day"               = as.Date(sprintf("%d-01-01", y)),
+      "Family Day"                   = compute_family_day(y),
+      "Good Friday"                  = compute_good_friday(y),
+      "Easter Monday"                = compute_easter_monday(y),
+      "Victoria Day"                 = compute_victoria_day(y),
+      "Canada Day"                   = as.Date(sprintf("%d-07-01", y)),
+      "BC Day"                       = compute_bc_day(y),
+      "Labour Day"                   = compute_labour_day(y),
+      "Truth and Reconciliation Day" = as.Date(sprintf("%d-09-30", y)),
+      "Thanksgiving Day"             = compute_thanksgiving(y),
+      "Remembrance Day"              = as.Date(sprintf("%d-11-11", y)),
+      "Christmas Day"                = as.Date(sprintf("%d-12-25", y)),
+      "Boxing Day"                   = as.Date(sprintf("%d-12-26", y))
+    )
+  })
+  all_hols <- do.call(c, hols_per_year)
 
-  good_friday      <- compute_good_friday(calendar_year)
-  easter_monday    <- compute_easter_monday(calendar_year)
-  victoria_day     <- compute_victoria_day(calendar_year)
-  labour_day       <- compute_labour_day(calendar_year)
-  thanksgiving_day <- compute_thanksgiving(calendar_year)
-  family_day       <- compute_family_day(calendar_year)
-  bc_day           <- compute_bc_day(calendar_year)
-
-  # Compile all holiday dates into a vector.
-  holidays <- c(
-    "New Year's Day"               = new_years_day,
-    "Family Day"                   = family_day,
-    "Good Friday"                  = good_friday,
-    "Easter Monday"                = easter_monday,
-    "Victoria Day"                 = victoria_day,
-    "Canada Day"                   = canada_day,
-    "BC Day"                       = bc_day,
-    "Labour Day"                   = labour_day,
-    "Truth and Reconciliation Day" = truth_and_reconciliation,
-    "Thanksgiving Day"             = thanksgiving_day,
-    "Remembrance Day"              = remembrance_day,
-    "Christmas Day"                = christmas_day,
-    "Boxing Day"                   = boxing_day
-  )
-
-  holidays
+  all_hols[order(all_hols)]
 }
 
 #' Compute Observed Holiday Date
@@ -256,16 +242,20 @@ get_holidays <- function(calendar_year) {
 #' @examples
 #' observed_date(as.Date("2025-12-25"))
 observed_date <- function(holiday_date) {
-  weekday_number <- lubridate::wday(holiday_date, week_start = 1)
-  if (weekday_number == 6) {
-    # Saturday: shift by 2 days to Monday.
-    holiday_observed_date <- holiday_date + lubridate::days(2)
-  } else if (weekday_number == 7) {
-    # Sunday: shift by 1 day to Monday.
-    holiday_observed_date <- holiday_date + lubridate::days(1)
-  } else {
-    holiday_observed_date <- holiday_date
-  }
+
+  holiday_date <- as.Date(holiday_date)
+  day_of_week <- lubridate::wday(holiday_date, week_start = 1)
+  shift <-
+    ifelse(
+      day_of_week == 6,
+      2,
+      ifelse(
+        day_of_week == 7,
+        1,
+        0
+      )
+    )
+  holiday_observed_date <- holiday_date + lubridate::days(shift)
 
   holiday_observed_date
 }
@@ -285,10 +275,21 @@ observed_date <- function(holiday_date) {
 #' @export
 get_observed_holidays <- function(calendar_year) {
 
-  official_holidays <- get_holidays(calendar_year)
-  observed_holidays <- sapply(official_holidays, observed_date)
+  calendar_years <- unique(as.integer(calendar_year))
+  observed_holidays_per_year <-
+    lapply(
+      calendar_years,
+      function(y) {
+        hols <- get_holidays(y)
+        obs  <- observed_date(hols)
+        names(obs) <- names(hols)
+        obs
+      }
+    )
+  observed_all <- do.call(c, observed_holidays_per_year)
 
-  as.Date(observed_holidays, origin = "1970-01-01")
+  observed_all
+
 }
 
 #' Check if a Date is an Official Holiday
@@ -304,10 +305,25 @@ get_observed_holidays <- function(calendar_year) {
 #'
 #' @export
 is_holiday <- function(query_date) {
-  holiday_year <- lubriquery_date::year(query_date)
-  holiday_query_dates <- get_holidays(holiday_year)
 
-  query_date %in% holiday_query_dates
+  query_date   <- as.Date(query_date)
+  holiday_year <- lubridate::year(query_date)
+
+  holiday_years <- unique(holiday_year)
+  holiday_list <-
+    setNames(
+      lapply(holiday_years, get_holidays),
+      holiday_years
+    )
+
+  vapply(
+    seq_along(query_date),
+    function(i) {
+      d <- query_date[i]
+      d %in% holiday_list[[ as.character(holiday_year[i]) ]]
+    },
+    logical(1)
+  )
 }
 
 #' Check if a Date is an Observed Holiday
@@ -324,8 +340,22 @@ is_holiday <- function(query_date) {
 #'
 #' @export
 is_observed_holiday <- function(query_date) {
+  query_date <- as.Date(query_date)
   holiday_year <- lubridate::year(query_date)
-  observed_holidays <- get_observed_holidays(holiday_year)
 
-  query_date %in% observed_holidays
+  holiday_years <- unique(holiday_year)
+  observed_list <-
+    setNames(
+      lapply(holiday_years, get_observed_holidays),
+      holiday_years
+    )
+
+  vapply(
+    seq_along(query_date),
+    function(i) {
+      d <- query_date[i]
+      d %in% observed_list[[ as.character(holiday_year[i]) ]]
+    },
+    logical(1)
+  )
 }
