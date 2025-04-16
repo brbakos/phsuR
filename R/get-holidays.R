@@ -207,27 +207,38 @@ compute_bc_day <- function(calendar_year) {
 #' @export
 get_holidays <- function(calendar_year) {
 
-  yrs <- unique(as.integer(calendar_year))
-  hols_per_year <- lapply(yrs, function(y) {
-    c(
-      "New Year's Day"               = as.Date(sprintf("%d-01-01", y)),
-      "Family Day"                   = compute_family_day(y),
-      "Good Friday"                  = compute_good_friday(y),
-      "Easter Monday"                = compute_easter_monday(y),
-      "Victoria Day"                 = compute_victoria_day(y),
-      "Canada Day"                   = as.Date(sprintf("%d-07-01", y)),
-      "BC Day"                       = compute_bc_day(y),
-      "Labour Day"                   = compute_labour_day(y),
-      "Truth and Reconciliation Day" = as.Date(sprintf("%d-09-30", y)),
-      "Thanksgiving Day"             = compute_thanksgiving(y),
-      "Remembrance Day"              = as.Date(sprintf("%d-11-11", y)),
-      "Christmas Day"                = as.Date(sprintf("%d-12-25", y)),
-      "Boxing Day"                   = as.Date(sprintf("%d-12-26", y))
-    )
-  })
-  all_hols <- do.call(c, hols_per_year)
+  calendar_years <- unique(as.integer(calendar_year))
+  holidays_per_year <-
+    lapply(
+      calendar_years,
+      function(y) {
 
-  all_hols[order(all_hols)]
+        h <-
+          c(
+            "New Year's Day"               = as.Date(sprintf("%d-01-01", y)),
+            "Family Day"                   = compute_family_day(y),
+            "Good Friday"                  = compute_good_friday(y),
+            "Easter Monday"                = compute_easter_monday(y),
+            "Victoria Day"                 = compute_victoria_day(y),
+            "Canada Day"                   = as.Date(sprintf("%d-07-01", y)),
+            "BC Day"                       = compute_bc_day(y),
+            "Labour Day"                   = compute_labour_day(y),
+            "Truth and Reconciliation Day" = as.Date(sprintf("%d-09-30", y)),
+            "Thanksgiving Day"             = compute_thanksgiving(y),
+            "Remembrance Day"              = as.Date(sprintf("%d-11-11", y)),
+            "Christmas Day"                = as.Date(sprintf("%d-12-25", y)),
+            "Boxing Day"                   = as.Date(sprintf("%d-12-26", y))
+          )
+
+        if (y < 2021) h  <- h[!names(h) %in% "Truth and Reconciliation Day"]
+
+        h
+      }
+    )
+  all_holidays <- do.call(c, holidays_per_year)
+
+  all_holidays[order(all_holidays)]
+
 }
 
 #' Compute Observed Holiday Date
