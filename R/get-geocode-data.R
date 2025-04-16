@@ -172,7 +172,7 @@ get_geocode_data <- function(address,
             ## than returning a list with a `data.frame` for main results and
             ## a `data.frame` with the faults
             address_faults <- properties$faults
-            has_faults <- ifelse(length(address_faults) > 0, TRUE, FALSE)
+            has_faults <- length(address_faults) > 0
 
             properties$faults <- NULL
             properties_data <- dplyr::tibble(!!!properties)
@@ -202,7 +202,7 @@ get_geocode_data <- function(address,
           features_list, ~ {
 
             address_faults <- .x$properties$faults
-            has_faults <- ifelse(length(address_faults) > 0, TRUE, FALSE)
+            has_faults <- length(address_faults) > 0
 
             faults_data <- if (faults && has_faults) {
               purrr::map_dfr(address_faults, ~ dplyr::tibble(

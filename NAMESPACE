@@ -2,4 +2,8 @@
 
 export(get_geocode_data)
 export(get_geocode_with_region)
+export(get_holidays)
+export(get_observed_holidays)
+export(is_holiday)
+export(is_observed_holiday)
 export(spatial_join_with_boundaries)

@@ -6,7 +6,7 @@ Author: Brendan Bakos
 Maintainer: Brendan Bakos <brendan.bakos@vch.ca>
 Description: Provides tools for geocoding and spatial analysis with a focus on
   attaching regional boundary information to datasets. Initially developed for
-  the Population Health Surveillance Unit (PHSU), the package is designed to
+  the Public Health Surveillance Unit (PHSU), the package is designed to
   support broader applications in spatial data processing and analysis.
 License: GPL-3
 Encoding: UTF-8
@@ -17,7 +17,8 @@ Imports:
   purrr,
   dplyr,
   httr2,
-  snakecase
+  snakecase,
+  lubridate
 Depends: 
   R (>= 4.1.0)
 RoxygenNote: 7.3.2
